@@ -577,7 +577,8 @@ paket-files/
 
 # Tabs Studio
 *.tss
-
+pictures/
+pictures/*
 # Telerik's JustMock configuration file
 *.jmconfig
 
