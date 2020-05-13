@@ -15,7 +15,7 @@ from users.models import Profile
 #Forms
 from users.forms import ProfileForm
 
-
+@login_required
 def update_profile(request):
     profile = request.user.profile
     if request.method == 'POST':
