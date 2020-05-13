@@ -9,10 +9,11 @@ class ProfileCompletionMiddleware:
 
     def __call__(self, request):
         if not request.user.is_anonymous:
-            profile = request.user.profile
-            if not profile.picture or not profile.biography:
-                if request.path != reverse in ['update_profile', 'logout']:
-                    return redirect('update_profile')
+            if not request.user.is_staff:
+                profile = request.user.profile
+                if not profile.picture or not profile.biography:
+                    if request.path != reverse in ['update_profile', 'logout']:
+                        return redirect('update_profile')
         response = self.get_response(request)
 
         return response
