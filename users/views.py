@@ -6,14 +6,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import DetailView, FormView
+from django.views.generic import DetailView, FormView, UpdateView
 
 # Models
 from django.contrib.auth.models import User
 from posts.models import Post
+from users.models import Profile
 
 # Forms
-from users.forms import ProfileForm, SignupForm
+from users.forms import SignupForm
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):
@@ -32,25 +33,7 @@ class UserDetailView(LoginRequiredMixin, DetailView):
         context['posts'] = Post.objects.filter(user=user).order_by('-created')
         return context
 
-
-"""def signup(request):
-    #Sign up view.
-    if request.method == 'POST':
-        form = SignupForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('users:login')
-    else:
-        form = SignupForm()
-
-    return render(
-        request=request,
-        template_name='users/signup.html',
-        context={'form': form}
-    )
-"""
-
-#http://ccbv.co.uk/projects/Django/3.0/django.views.generic.edit/UpdateView/
+#http://ccbv.co.uk/projects/Django/3.0/django.views.generic.edit/FormView/
 class SignupView(FormView):
     """ Users sign up views. """
     template_name = 'users/signup.html'
@@ -63,10 +46,27 @@ class SignupView(FormView):
         form.save()
         return super().form_valid(form)
 
+#http://ccbv.co.uk/projects/Django/3.0/django.views.generic.edit/UpdateView/
+class UpdateProfileView(LoginRequiredMixin, UpdateView):
+    """ Update profile view """
+    
+    template_name = 'users/update_profile.html'
+    model= Profile
+    fields = ['website','phone_number','biography','picture']
 
+    def get_object(self):
+        """ Return users profile"""
+        return self.request.user.profile 
+
+    def get_success_url(self):
+         """ Return to users profile """
+         username =  self.object.user.username
+         return reverse('users:detail', kwargs={'username': username })
+
+"""
 @login_required
 def update_profile(request):
-    """Update a user's profile view."""
+   #Update a user's profile view.
     profile = request.user.profile
 
     if request.method == 'POST':
@@ -96,7 +96,7 @@ def update_profile(request):
             'form': form
         }
     )
-
+"""
 
 def login_view(request):
     """Login view."""
